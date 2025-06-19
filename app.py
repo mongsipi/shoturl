@@ -20,6 +20,15 @@ class WebURLShortener:
         
         # 1. TinyURL - 가장 안정적
         try:
+            encoded_url = quote(long_url, safe=':/?#[]@!    def shorten_url(self, long_url):
+        """서버에서 TinyURL API 호출"""
+        
+        # URL 보정
+        if not long_url.startswith(('http://', 'https://')):
+            long_url = 'https://' + long_url
+        
+        # 1. TinyURL - 가장 안정적
+        try:
             encoded_url = quote(long_url, safe=':/?#[]@!$&\'()*+,;=')
             response = requests.get(
                 f'http://tinyurl.com/api-create.php?url={encoded_url}',
@@ -79,6 +88,86 @@ class WebURLShortener:
                         "short_url": short_url, 
                         "original_url": long_url, 
                         "service": "v.gd"
+                    }
+        except Exception as e:
+            print(f"v.gd 오류: {e}")
+            
+        return {
+            "success": False, 
+            "error": "현재 모든 단축 서비스가 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요."
+        }\'()*+,;=')
+            response = requests.get(
+                f'http://tinyurl.com/api-create.php?url={encoded_url}',
+                headers=self.headers,
+                timeout=15
+            )
+            
+            if response.status_code == 200:
+                short_url = response.text.strip()
+                if short_url and 'tinyurl.com' in short_url and not short_url.startswith('Error'):
+                    # 실제 TinyURL 저장하고 커스텀 표시용 URL 생성
+                    code = short_url.split('/')[-1]  # tinyurl.com/abc123 → abc123
+                    display_url = f"himart.co/{code}"  # 표시용 URL
+                    
+                    return {
+                        "success": True, 
+                        "short_url": display_url,  # 화면에 표시될 URL
+                        "actual_url": short_url,   # 실제 TinyURL
+                        "original_url": long_url, 
+                        "service": "TinyURL (브랜딩)"
+                    }
+        except Exception as e:
+            print(f"TinyURL 오류: {e}")
+        
+        # 2. is.gd - 백업
+        try:
+            data = {'format': 'simple', 'url': long_url}
+            response = requests.post(
+                'https://is.gd/create.php',
+                data=data,
+                headers=self.headers,
+                timeout=15
+            )
+            
+            if response.status_code == 200:
+                short_url = response.text.strip()
+                if short_url and 'is.gd' in short_url and not short_url.startswith('Error'):
+                    # is.gd도 브랜딩 적용
+                    code = short_url.split('/')[-1]
+                    display_url = f"himart.co/{code}"
+                    
+                    return {
+                        "success": True, 
+                        "short_url": display_url,
+                        "actual_url": short_url,
+                        "original_url": long_url, 
+                        "service": "is.gd (브랜딩)"
+                    }
+        except Exception as e:
+            print(f"is.gd 오류: {e}")
+        
+        # 3. v.gd - 추가 백업
+        try:
+            data = {'format': 'simple', 'url': long_url}
+            response = requests.post(
+                'https://v.gd/create.php',
+                data=data,
+                headers=self.headers,
+                timeout=15
+            )
+            
+            if response.status_code == 200:
+                short_url = response.text.strip()
+                if short_url and 'v.gd' in short_url and not short_url.startswith('Error'):
+                    code = short_url.split('/')[-1]
+                    display_url = f"himart.co/{code}"
+                    
+                    return {
+                        "success": True, 
+                        "short_url": display_url,
+                        "actual_url": short_url,
+                        "original_url": long_url, 
+                        "service": "v.gd (브랜딩)"
                     }
         except Exception as e:
             print(f"v.gd 오류: {e}")
@@ -380,7 +469,7 @@ HTML_TEMPLATE = """
                 </div>
             </div>
         </div>
-
+        
     <script>
         document.getElementById('shortenForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -491,7 +580,7 @@ if __name__ == '__main__':
     PORT = int(os.getenv('PORT', 5000))
     DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
     
-    print("🚀 웹서버 URL 단축기를 시작합니다!")
+    print("🚀 CRM TFT URL 단축기를 시작합니다!")
     print("🌐 서버에서 직접 TinyURL API를 호출합니다!")
     print("🛡️  클라이언트 네트워크 제한을 우회합니다!")
     print(f"📱 포트: {PORT}")
