@@ -29,16 +29,11 @@ class WebURLShortener:
             if response.status_code == 200:
                 short_url = response.text.strip()
                 if short_url and 'tinyurl.com' in short_url and not short_url.startswith('Error'):
-                    # 실제 TinyURL 저장하고 커스텀 표시용 URL 생성
-                    code = short_url.split('/')[-1]  # tinyurl.com/abc123 → abc123
-                    display_url = 'himart.co/' + code  # 표시용 URL
-                    
                     return {
                         "success": True, 
-                        "short_url": display_url,  # 화면에 표시될 URL
-                        "actual_url": short_url,   # 실제 TinyURL
+                        "short_url": short_url,  # 실제 TinyURL 그대로
                         "original_url": long_url, 
-                        "service": "TinyURL (브랜딩)"
+                        "service": "TinyURL (하이마트 서비스)"
                     }
         except Exception as e:
             print('TinyURL 오류: ' + str(e))
@@ -56,16 +51,11 @@ class WebURLShortener:
             if response.status_code == 200:
                 short_url = response.text.strip()
                 if short_url and 'is.gd' in short_url and not short_url.startswith('Error'):
-                    # is.gd도 브랜딩 적용
-                    code = short_url.split('/')[-1]
-                    display_url = 'himart.co/' + code
-                    
                     return {
                         "success": True, 
-                        "short_url": display_url,
-                        "actual_url": short_url,
+                        "short_url": short_url,  # 실제 링크 그대로
                         "original_url": long_url, 
-                        "service": "is.gd (브랜딩)"
+                        "service": "is.gd (하이마트 서비스)"
                     }
         except Exception as e:
             print('is.gd 오류: ' + str(e))
@@ -83,15 +73,11 @@ class WebURLShortener:
             if response.status_code == 200:
                 short_url = response.text.strip()
                 if short_url and 'v.gd' in short_url and not short_url.startswith('Error'):
-                    code = short_url.split('/')[-1]
-                    display_url = 'himart.co/' + code
-                    
                     return {
                         "success": True, 
-                        "short_url": display_url,
-                        "actual_url": short_url,
+                        "short_url": short_url,  # 실제 링크 그대로
                         "original_url": long_url, 
-                        "service": "v.gd (브랜딩)"
+                        "service": "v.gd (하이마트 서비스)"
                     }
         except Exception as e:
             print('v.gd 오류: ' + str(e))
@@ -355,7 +341,7 @@ HTML_TEMPLATE = """
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔗 CRM TFT URL 단축기</h1>
+            <h1>🔗 CRM TFT 단축기</h1>
         </div>
         
         <form id="shortenForm">
@@ -393,7 +379,6 @@ HTML_TEMPLATE = """
                 </div>
             </div>
         </div>
-        </div>
     </div>
 
     <script>
@@ -414,7 +399,7 @@ HTML_TEMPLATE = """
             
             // UI 상태 변경
             shortenBtn.disabled = true;
-            shortenBtn.textContent = '⏳ 링크 생성 중...';
+            shortenBtn.textContent = '⏳ 단축링크 생성 중...';
             loading.style.display = 'block';
             result.style.display = 'none';
             
@@ -436,25 +421,7 @@ HTML_TEMPLATE = """
                     result.className = 'result success';
                     document.getElementById('originalUrl').textContent = data.original_url;
                     document.getElementById('shortUrlText').textContent = data.short_url;
-                    document.getElementById('serviceUsed').textContent = `(${data.service})`;
-                    
-                    // 실제 링크가 있으면 클릭 이벤트 추가
-                    if (data.actual_url) {
-                        const shortUrlElement = document.getElementById('shortUrlText');
-                        shortUrlElement.style.cursor = 'pointer';
-                        shortUrlElement.style.textDecoration = 'underline';
-                        shortUrlElement.onclick = function() {
-                            window.open(data.actual_url, '_blank');
-                        };
-                        
-                        // 실제 링크 정보 추가 표시
-                        const actualLinkInfo = document.createElement('div');
-                        actualLinkInfo.style.fontSize = '12px';
-                        actualLinkInfo.style.color = '#666';
-                        actualLinkInfo.style.marginTop = '5px';
-                        actualLinkInfo.innerHTML = '💡 실제 링크: <a href="' + data.actual_url + '" target="_blank">' + data.actual_url + '</a>';
-                        document.getElementById('shortUrl').appendChild(actualLinkInfo);
-                    }
+                    document.getElementById('serviceUsed').textContent = '(' + data.service + ')';
                 } else {
                     result.className = 'result error';
                     result.innerHTML = '<strong>오류:</strong> ' + data.error;
@@ -468,13 +435,13 @@ HTML_TEMPLATE = """
             }
             
             shortenBtn.disabled = false;
-            shortenBtn.textContent = '🚀 Himart 단축링크 생성하기';
+            shortenBtn.textContent = '🚀 단축링크 생성하기';
         });
         
         function copyToClipboard(elementId) {
             const text = document.getElementById(elementId).textContent;
             navigator.clipboard.writeText(text).then(function() {
-                alert('링크가 복사되었습니다! 📋');
+                alert('단축링크가 복사되었습니다! 📋');
             }).catch(function() {
                 // 폴백: 텍스트 선택
                 const textArea = document.createElement('textarea');
@@ -483,7 +450,7 @@ HTML_TEMPLATE = """
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                alert('링크가 복사되었습니다! 📋');
+                alert('단축링크가 복사되었습니다! 📋');
             });
         }
     </script>
@@ -515,14 +482,13 @@ def shorten():
 @app.route('/health')
 def health():
     """헬스체크용 엔드포인트"""
-    return jsonify({'status': 'ok', 'message': 'Himart URL 단축 서비스가 정상 작동 중입니다.'})
+    return jsonify({'status': 'ok', 'message': 'CRM TFT URL 단축 서비스가 정상 작동 중입니다.'})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('DEBUG', 'False').lower() == 'true'
     
-    print("🚀 Himart URL 단축기를 시작합니다!")
-    print("🎨 하이마트 브랜딩이 적용된 단축링크 서비스")
+    print("🚀 CRM TFT URL 단축기를 시작합니다!")
     print(f"📱 포트: {port}")
     
     if debug:
