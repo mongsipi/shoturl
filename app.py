@@ -20,94 +20,18 @@ class WebURLShortener:
         
         # 1. TinyURL - 가장 안정적
         try:
-            encoded_url = quote(long_url, safe=':/?#[]@!    def shorten_url(self, long_url):
-        """서버에서 TinyURL API 호출"""
-        
-        # URL 보정
-        if not long_url.startswith(('http://', 'https://')):
-            long_url = 'https://' + long_url
-        
-        # 1. TinyURL - 가장 안정적
-        try:
-            encoded_url = quote(long_url, safe=':/?#[]@!$&\'()*+,;=')
-            response = requests.get(
-                f'http://tinyurl.com/api-create.php?url={encoded_url}',
-                headers=self.headers,
-                timeout=15
-            )
+            safe_chars = ':/?#[]@!$&()*+,;='
+            encoded_url = quote(long_url, safe=safe_chars)
+            api_url = 'http://tinyurl.com/api-create.php?url=' + encoded_url
             
-            if response.status_code == 200:
-                short_url = response.text.strip()
-                if short_url and 'tinyurl.com' in short_url and not short_url.startswith('Error'):
-                    return {
-                        "success": True, 
-                        "short_url": short_url, 
-                        "original_url": long_url, 
-                        "service": "TinyURL"
-                    }
-        except Exception as e:
-            print(f"TinyURL 오류: {e}")
-        
-        # 2. is.gd - 백업
-        try:
-            data = {'format': 'simple', 'url': long_url}
-            response = requests.post(
-                'https://is.gd/create.php',
-                data=data,
-                headers=self.headers,
-                timeout=15
-            )
-            
-            if response.status_code == 200:
-                short_url = response.text.strip()
-                if short_url and 'is.gd' in short_url and not short_url.startswith('Error'):
-                    return {
-                        "success": True, 
-                        "short_url": short_url, 
-                        "original_url": long_url, 
-                        "service": "is.gd"
-                    }
-        except Exception as e:
-            print(f"is.gd 오류: {e}")
-        
-        # 3. v.gd - 추가 백업
-        try:
-            data = {'format': 'simple', 'url': long_url}
-            response = requests.post(
-                'https://v.gd/create.php',
-                data=data,
-                headers=self.headers,
-                timeout=15
-            )
-            
-            if response.status_code == 200:
-                short_url = response.text.strip()
-                if short_url and 'v.gd' in short_url and not short_url.startswith('Error'):
-                    return {
-                        "success": True, 
-                        "short_url": short_url, 
-                        "original_url": long_url, 
-                        "service": "v.gd"
-                    }
-        except Exception as e:
-            print(f"v.gd 오류: {e}")
-            
-        return {
-            "success": False, 
-            "error": "현재 모든 단축 서비스가 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요."
-        }\'()*+,;=')
-            response = requests.get(
-                f'http://tinyurl.com/api-create.php?url={encoded_url}',
-                headers=self.headers,
-                timeout=15
-            )
+            response = requests.get(api_url, headers=self.headers, timeout=15)
             
             if response.status_code == 200:
                 short_url = response.text.strip()
                 if short_url and 'tinyurl.com' in short_url and not short_url.startswith('Error'):
                     # 실제 TinyURL 저장하고 커스텀 표시용 URL 생성
                     code = short_url.split('/')[-1]  # tinyurl.com/abc123 → abc123
-                    display_url = f"himart.co/{code}"  # 표시용 URL
+                    display_url = 'himart.co/' + code  # 표시용 URL
                     
                     return {
                         "success": True, 
@@ -117,7 +41,7 @@ class WebURLShortener:
                         "service": "TinyURL (브랜딩)"
                     }
         except Exception as e:
-            print(f"TinyURL 오류: {e}")
+            print('TinyURL 오류: ' + str(e))
         
         # 2. is.gd - 백업
         try:
@@ -134,7 +58,7 @@ class WebURLShortener:
                 if short_url and 'is.gd' in short_url and not short_url.startswith('Error'):
                     # is.gd도 브랜딩 적용
                     code = short_url.split('/')[-1]
-                    display_url = f"himart.co/{code}"
+                    display_url = 'himart.co/' + code
                     
                     return {
                         "success": True, 
@@ -144,7 +68,7 @@ class WebURLShortener:
                         "service": "is.gd (브랜딩)"
                     }
         except Exception as e:
-            print(f"is.gd 오류: {e}")
+            print('is.gd 오류: ' + str(e))
         
         # 3. v.gd - 추가 백업
         try:
@@ -160,7 +84,7 @@ class WebURLShortener:
                 short_url = response.text.strip()
                 if short_url and 'v.gd' in short_url and not short_url.startswith('Error'):
                     code = short_url.split('/')[-1]
-                    display_url = f"himart.co/{code}"
+                    display_url = 'himart.co/' + code
                     
                     return {
                         "success": True, 
@@ -170,7 +94,7 @@ class WebURLShortener:
                         "service": "v.gd (브랜딩)"
                     }
         except Exception as e:
-            print(f"v.gd 오류: {e}")
+            print('v.gd 오류: ' + str(e))
             
         return {
             "success": False, 
@@ -232,7 +156,7 @@ HTML_TEMPLATE = """
         
         .badge {
             display: inline-block;
-            background: #28a745;
+            background: #ff6b35;
             color: white;
             padding: 5px 15px;
             border-radius: 20px;
@@ -269,7 +193,7 @@ HTML_TEMPLATE = """
         .shorten-btn {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -281,7 +205,7 @@ HTML_TEMPLATE = """
         
         .shorten-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
         }
         
         .shorten-btn:disabled {
@@ -358,7 +282,7 @@ HTML_TEMPLATE = """
         
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border-top: 4px solid #ff6b35;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -372,16 +296,16 @@ HTML_TEMPLATE = """
         }
         
         .info-box {
-            background: #e3f2fd;
-            border: 1px solid #2196f3;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
             border-radius: 10px;
             padding: 20px;
             margin-top: 30px;
-            border-left: 4px solid #2196f3;
+            border-left: 4px solid #ff6b35;
         }
         
         .info-box h3 {
-            color: #1976d2;
+            color: #e17055;
             margin-bottom: 10px;
         }
         
@@ -399,7 +323,7 @@ HTML_TEMPLATE = """
         }
         
         .feature-item {
-            color: #1976d2;
+            color: #e17055;
             font-size: 14px;
             display: flex;
             align-items: center;
@@ -407,7 +331,7 @@ HTML_TEMPLATE = """
         
         .feature-item::before {
             content: "✓";
-            color: #4caf50;
+            color: #00b894;
             font-weight: bold;
             margin-right: 8px;
         }
@@ -453,7 +377,7 @@ HTML_TEMPLATE = """
         
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>서버에서 단축링크를 생성하는 중...</p>
+            <p>단축링크를 생성하는 중...</p>
         </div>
         
         <div class="result" id="result">
@@ -469,7 +393,9 @@ HTML_TEMPLATE = """
                 </div>
             </div>
         </div>
-        
+        </div>
+    </div>
+
     <script>
         document.getElementById('shortenForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -488,7 +414,7 @@ HTML_TEMPLATE = """
             
             // UI 상태 변경
             shortenBtn.disabled = true;
-            shortenBtn.textContent = '⏳ 서버에서 처리 중...';
+            shortenBtn.textContent = '⏳ 링크 생성 중...';
             loading.style.display = 'block';
             result.style.display = 'none';
             
@@ -510,27 +436,45 @@ HTML_TEMPLATE = """
                     result.className = 'result success';
                     document.getElementById('originalUrl').textContent = data.original_url;
                     document.getElementById('shortUrlText').textContent = data.short_url;
-                    document.getElementById('serviceUsed').textContent = `(${data.service} 사용)`;
+                    document.getElementById('serviceUsed').textContent = `(${data.service})`;
+                    
+                    // 실제 링크가 있으면 클릭 이벤트 추가
+                    if (data.actual_url) {
+                        const shortUrlElement = document.getElementById('shortUrlText');
+                        shortUrlElement.style.cursor = 'pointer';
+                        shortUrlElement.style.textDecoration = 'underline';
+                        shortUrlElement.onclick = function() {
+                            window.open(data.actual_url, '_blank');
+                        };
+                        
+                        // 실제 링크 정보 추가 표시
+                        const actualLinkInfo = document.createElement('div');
+                        actualLinkInfo.style.fontSize = '12px';
+                        actualLinkInfo.style.color = '#666';
+                        actualLinkInfo.style.marginTop = '5px';
+                        actualLinkInfo.innerHTML = '💡 실제 링크: <a href="' + data.actual_url + '" target="_blank">' + data.actual_url + '</a>';
+                        document.getElementById('shortUrl').appendChild(actualLinkInfo);
+                    }
                 } else {
                     result.className = 'result error';
-                    result.innerHTML = `<strong>오류:</strong> ${data.error}`;
+                    result.innerHTML = '<strong>오류:</strong> ' + data.error;
                 }
                 
             } catch (error) {
                 loading.style.display = 'none';
                 result.style.display = 'block';
                 result.className = 'result error';
-                result.innerHTML = `<strong>오류:</strong> 서버와의 연결을 확인해주세요.`;
+                result.innerHTML = '<strong>오류:</strong> 서버와의 연결을 확인해주세요.';
             }
             
             shortenBtn.disabled = false;
-            shortenBtn.textContent = '🚀 단축링크 생성하기';
+            shortenBtn.textContent = '🚀 Himart 단축링크 생성하기';
         });
         
         function copyToClipboard(elementId) {
             const text = document.getElementById(elementId).textContent;
             navigator.clipboard.writeText(text).then(function() {
-                alert('복사되었습니다! 📋');
+                alert('링크가 복사되었습니다! 📋');
             }).catch(function() {
                 // 폴백: 텍스트 선택
                 const textArea = document.createElement('textarea');
@@ -539,7 +483,7 @@ HTML_TEMPLATE = """
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                alert('복사되었습니다! 📋');
+                alert('링크가 복사되었습니다! 📋');
             });
         }
     </script>
@@ -571,26 +515,19 @@ def shorten():
 @app.route('/health')
 def health():
     """헬스체크용 엔드포인트"""
-    return jsonify({'status': 'ok', 'message': 'URL 단축 서비스가 정상 작동 중입니다.'})
+    return jsonify({'status': 'ok', 'message': 'Himart URL 단축 서비스가 정상 작동 중입니다.'})
 
 if __name__ == '__main__':
-    import os
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
     
-    # 환경 변수로 설정 가능
-    PORT = int(os.getenv('PORT', 5000))
-    DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+    print("🚀 Himart URL 단축기를 시작합니다!")
+    print("🎨 하이마트 브랜딩이 적용된 단축링크 서비스")
+    print(f"📱 포트: {port}")
     
-    print("🚀 CRM TFT URL 단축기를 시작합니다!")
-    print("🌐 서버에서 직접 TinyURL API를 호출합니다!")
-    print("🛡️  클라이언트 네트워크 제한을 우회합니다!")
-    print(f"📱 포트: {PORT}")
-    
-    if DEBUG:
+    if debug:
         print("📍 로컬 테스트: http://localhost:5000")
     else:
         print("🌍 프로덕션 모드: 모든 IP에서 접속 가능")
-        print("💡 프로덕션 배포 권장: gunicorn -w 4 -b 0.0.0.0:5000 app:app")
     
-    print("⏹️  종료하려면 Ctrl+C를 누르세요.")
-    
-    app.run(debug=DEBUG, host='0.0.0.0', port=PORT)
+    app.run(debug=debug, host='0.0.0.0', port=port)
