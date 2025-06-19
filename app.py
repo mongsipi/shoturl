@@ -342,9 +342,7 @@ HTML_TEMPLATE = """
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔗 웹서버 URL 단축기</h1>
-            <p>네트워크 제한을 우회하는 스마트한 단축링크 서비스!</p>
-            <span class="badge">서버사이드 처리</span>
+            <h1>🔗 CRM TFT URL 단축기</h1>
         </div>
         
         <form id="shortenForm">
@@ -382,26 +380,6 @@ HTML_TEMPLATE = """
                 </div>
             </div>
         </div>
-        
-        <div class="info-box">
-            <h3>🌟 웹서버 방식의 장점</h3>
-            <p>서버에서 직접 TinyURL API를 호출하므로 클라이언트의 네트워크 제한을 우회할 수 있습니다!</p>
-            
-            <div class="feature-list">
-                <div class="feature-item">네트워크 제한 우회</div>
-                <div class="feature-item">회사/학교 방화벽 무관</div>
-                <div class="feature-item">안정적인 TinyURL 사용</div>
-                <div class="feature-item">여러 서비스 자동 시도</div>
-                <div class="feature-item">전 세계 어디서든 접속</div>
-                <div class="feature-item">SSL 차단 문제 해결</div>
-            </div>
-            
-            <p style="margin-top: 15px; font-size: 14px; color: #666;">
-                <strong>작동 원리:</strong> 
-                클라이언트 → 웹서버 → TinyURL API → 결과 반환
-            </p>
-        </div>
-    </div>
 
     <script>
         document.getElementById('shortenForm').addEventListener('submit', async function(e) {
