@@ -33,7 +33,7 @@ class WebURLShortener:
                         "success": True, 
                         "short_url": short_url,  # 실제 TinyURL 그대로
                         "original_url": long_url, 
-                        "service": "TinyURL (하이마트 서비스)"
+                        "service": "TinyURL"
                     }
         except Exception as e:
             print('TinyURL 오류: ' + str(e))
@@ -55,7 +55,7 @@ class WebURLShortener:
                         "success": True, 
                         "short_url": short_url,  # 실제 링크 그대로
                         "original_url": long_url, 
-                        "service": "is.gd (하이마트 서비스)"
+                        "service": "is.gd"
                     }
         except Exception as e:
             print('is.gd 오류: ' + str(e))
@@ -77,7 +77,7 @@ class WebURLShortener:
                         "success": True, 
                         "short_url": short_url,  # 실제 링크 그대로
                         "original_url": long_url, 
-                        "service": "v.gd (하이마트 서비스)"
+                        "service": "v.gd"
                     }
         except Exception as e:
             print('v.gd 오류: ' + str(e))
